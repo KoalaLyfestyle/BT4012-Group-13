@@ -1,4 +1,0 @@
-# List your Python dependencies here, one per line.
-kagglehub[pandas-datasets] #==0.3.13
-numpy #==2.3.3
-pandas #==2.3.2
