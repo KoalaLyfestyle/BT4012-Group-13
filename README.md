@@ -23,6 +23,8 @@ We use a real world phishing dataset to train our model, PhiUSIIL, published on 
 	</tbody>
 </table>
 
+The link to the dataset and introductory paper can be found [here](https://archive.ics.uci.edu/dataset/967/phiusiil+phishing+url+dataset).
+
 ## Planned Methodology
 
 In our planned methodology, we will explore two different approaches. The first approach involves utilising most of the features provided in the dataset to build a comprehensive model. However, some features, such as NoOfCSS and URLTitleMatchScore, are not easily obtainable when only the URL is available. To improve real-world applicability, our second approach restricts the feature set to those that can be directly derived from the URL itself, such as NoOfLettersInURL and URLLength. This allows users to determine whether a URL is legitimate using only the URL as input.
