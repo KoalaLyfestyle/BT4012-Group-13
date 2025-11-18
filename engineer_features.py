@@ -46,9 +46,9 @@ def engineer_features(df):
     # Using an IP instead of a hostname is suspicious.
     # Combining with protocol amplifies signal:
     # - IP + HTTP is especially suspicious
-    # - IP + HTTPS is rare but still unusual
-    final_df['ip_x_http'] = final_df['is_domain_ip'] * final_df['is_http']
-    final_df['ip_x_https'] = final_df['is_domain_ip'] * final_df['is_https']
+    # - IP + HTTPS is rare but still unusual (not using, zero variance in dataset)
+    final_df['ip_x_http'] = (final_df['is_domain_ip'] * final_df['is_http']).astype(bool)
+    # final_df['ip_x_https'] = (final_df['is_domain_ip'] * final_df['is_https']).astype(bool)
 
     # ------------------------------
     # Domain Complexity Score
