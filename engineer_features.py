@@ -17,7 +17,7 @@ def engineer_features(df):
     # Legitimate domains usually have TLDs and are rarely accessed via IP.
     # URLs with an IP but no TLD are highly suspicious.
     final_df['ip_and_no_tld'] = (
-        final_df['is_ip_address'] & (final_df['has_tld'] == 0)
+        final_df['is_domain_ip'] & (final_df['has_tld'] == 0)
     ).astype(bool)
 
     # ------------------------------
@@ -47,8 +47,8 @@ def engineer_features(df):
     # Combining with protocol amplifies signal:
     # - IP + HTTP is especially suspicious
     # - IP + HTTPS is rare but still unusual
-    final_df['ip_x_http'] = final_df['is_ip_address'] * final_df['is_http']
-    final_df['ip_x_https'] = final_df['is_ip_address'] * final_df['is_https']
+    final_df['ip_x_http'] = final_df['is_domain_ip'] * final_df['is_http']
+    final_df['ip_x_https'] = final_df['is_domain_ip'] * final_df['is_https']
 
     # ------------------------------
     # Domain Complexity Score
@@ -61,7 +61,7 @@ def engineer_features(df):
     final_df['domain_complexity_score'] = (
         final_df['num_subdomain'] +
         (1 - final_df['has_tld']) +
-        final_df['is_ip_address'] * 2
+        final_df['is_domain_ip'] * 2
     )
 
     # ------------------------------
@@ -76,7 +76,7 @@ def engineer_features(df):
     final_df['suspicion_score'] = (
         final_df['is_http'] * 2 +
         (final_df['num_subdomain'] > 2).astype(int) * 2 +
-        final_df['is_ip_address'].astype(int) * 3 +
+        final_df['is_domain_ip'].astype(int) * 3 +
         (final_df['has_tld'] == 0).astype(int) * 2
     )
 
