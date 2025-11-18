@@ -64,6 +64,10 @@ def engineer_features(df):
         final_df['is_domain_ip'] * 2
     )
 
+    # Normalized domain complexity score (0 to 1 scale)
+    max_complexity = final_df['num_subdomain'].max() + 1 + 2  # max subdomains + short TLD + IP
+    final_df['domain_complexity_score'] = final_df['domain_complexity_score'] / max_complexity
+
     # ------------------------------
     # Suspicion Score
     # ------------------------------
@@ -79,5 +83,9 @@ def engineer_features(df):
         final_df['is_domain_ip'].astype(int) * 3 +
         (final_df['length_tld'] <= 2).astype(int) * 2
     )
+
+    # Normalized suspicion score (0 to 1 scale)
+    max_score = 9  # Maximum possible suspicion score based on above weights
+    final_df['suspicion_score'] = final_df['suspicion_score'] / max_score
 
     return final_df
