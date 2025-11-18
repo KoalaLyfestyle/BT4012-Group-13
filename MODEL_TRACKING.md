@@ -2,7 +2,7 @@
 
 ## Overview
 
-This document outlines the standard metrics, artifacts, and organization structure for tracking all models in this competition.
+This document outlines the standard metrics, artifacts, and organization structure for tracking all models in this project.
 
 ---
 
