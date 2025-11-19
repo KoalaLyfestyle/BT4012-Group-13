@@ -237,7 +237,7 @@ class ModelSaver:
             metrics_data["notes"] = additional_notes
         
         with open(self._exp_dir / "metrics.json", "w") as f:
-            json.dump(metrics_data, f, indent=2)
+            json.dump(_make_json_serializable(metrics_data), f, indent=2, cls=NumpyJSONEncoder)
         
         # Save Optuna study if provided
         if optuna_study is not None:
@@ -260,6 +260,57 @@ class ModelSaver:
         self._incremental_mode = False
         
         return self._exp_dir
+
+    def _save_optuna_study(self, optuna_study: Any, exp_dir: Path):
+        """Save Optuna study object."""
+        study_path = exp_dir / "optuna_study.pkl"
+        with open(study_path, "wb") as f:
+            pickle.dump(optuna_study, f)
+
+        # Create plots directory
+        plots_dir = exp_dir / "optuna_plots"
+        plots_dir.mkdir(exist_ok=True)
+
+        try:
+            import optuna.visualization as vis
+
+            # Save optimization history
+            fig = vis.plot_optimization_history(optuna_study)
+            fig.write_html(plots_dir / "optimization_history.html")
+
+            # Save parameter importance
+            fig = vis.plot_param_importances(optuna_study)
+            fig.write_html(plots_dir / "param_importances.html")
+
+            # Save parallel coordinate plot
+            fig = vis.plot_parallel_coordinate(optuna_study)
+            fig.write_html(plots_dir / "parallel_coordinate.html")
+
+            print(f"  Optuna plots saved to {plots_dir}")
+        except Exception as e:
+            warnings.warn(f"Could not create Optuna plots: {e}")
+
+    def _save_prediction(
+        self,
+        test_predictions: np.ndarray,
+        exp_dir: Path,
+        experiment_name: str,
+    ):
+        """Save prediction CSV file."""
+        prediction_path = exp_dir / f"{experiment_name}_prediction.csv"
+
+        # Create prediction dataframe
+        prediction_data = {
+            "id": np.arange(len(test_predictions)),
+            "probability": test_predictions,
+        }
+
+        # Save as CSV
+        import pandas as pd
+
+        df = pd.DataFrame(prediction_data)
+        df.to_csv(prediction_path, index=False)
+        print(f"  Predictions saved to {prediction_path}")
     
     def save_experiment(
         self,
@@ -359,7 +410,7 @@ class ModelSaver:
         )
         
         with open(exp_dir / "metrics.json", "w") as f:
-            json.dump(metrics_data, f, indent=2)
+            json.dump(_make_json_serializable(metrics_data), f, indent=2, cls=NumpyJSONEncoder)
         
         # Save Optuna study if provided
         if optuna_study is not None:
@@ -561,7 +612,7 @@ class ModelSaver:
         
         # Save updated data
         with open(features_file, "w") as f:
-            json.dump(feature_data, f, indent=2)
+            json.dump(_make_json_serializable(feature_data), f, indent=2, cls=NumpyJSONEncoder)
     
     def _save_feature_names(
         self, 
@@ -588,7 +639,7 @@ class ModelSaver:
             feature_data.append(fold_info)
         
         with open(exp_dir / "feature_names_all_folds.json", "w") as f:
-            json.dump(feature_data, f, indent=2)
+            json.dump(_make_json_serializable(feature_data), f, indent=2, cls=NumpyJSONEncoder)
     
     def _calculate_average_metrics(self, fold_metrics: List[Dict]) -> Dict:
         """Calculate average and standard deviation for all metrics."""
@@ -643,56 +694,107 @@ class ModelSaver:
             metrics_data["optuna_study"] = optuna_params
         
         return metrics_data
-    
-    def _save_optuna_study(self, optuna_study: Any, exp_dir: Path):
-        """Save Optuna study object."""
-        study_path = exp_dir / "optuna_study.pkl"
-        with open(study_path, "wb") as f:
-            pickle.dump(optuna_study, f)
-        
-        # Create plots directory
-        plots_dir = exp_dir / "optuna_plots"
-        plots_dir.mkdir(exist_ok=True)
-        
+
+
+class NumpyJSONEncoder(json.JSONEncoder):
+    """JSON encoder that handles numpy and pandas data types gracefully.
+
+    Converts numpy integers/floats/bools to native Python types, numpy arrays
+    to lists, pandas Series/Index to Python lists and pandas Timestamps to ISO
+    formatted strings. This prevents TypeError: Object of type int64 is not JSON
+    serializable when writing experiment metadata.
+    """
+    def default(self, o):
+        # Local import for optional dependencies
         try:
-            import optuna.visualization as vis
-            
-            # Save optimization history
-            fig = vis.plot_optimization_history(optuna_study)
-            fig.write_html(plots_dir / "optimization_history.html")
-            
-            # Save parameter importance
-            fig = vis.plot_param_importances(optuna_study)
-            fig.write_html(plots_dir / "param_importances.html")
-            
-            # Save parallel coordinate plot
-            fig = vis.plot_parallel_coordinate(optuna_study)
-            fig.write_html(plots_dir / "parallel_coordinate.html")
-            
-            print(f"  Optuna plots saved to {plots_dir}")
-        except Exception as e:
-            warnings.warn(f"Could not create Optuna plots: {e}")
-    
-    def _save_prediction(
-        self, 
-        test_predictions: np.ndarray, 
-        exp_dir: Path, 
-        experiment_name: str
-    ):
-        """Save prediction CSV file."""
-        prediction_path = exp_dir / f"{experiment_name}_prediction.csv"
-        
-        # Create prediction dataframe
-        prediction_data = {
-            "id": np.arange(len(test_predictions)),
-            "probability": test_predictions
-        }
-        
-        # Save as CSV
-        import pandas as pd
-        df = pd.DataFrame(prediction_data)
-        df.to_csv(prediction_path, index=False)
-        print(f"  Predictions saved to {prediction_path}")
+            import numpy as _np
+        except Exception:
+            _np = None
+
+        try:
+            import pandas as _pd
+        except Exception:
+            _pd = None
+
+        # Numpy types
+        if _np is not None:
+            if isinstance(o, (_np.integer,)):
+                return int(o)
+            if isinstance(o, (_np.floating,)):
+                return float(o)
+            if isinstance(o, (_np.bool_,)):
+                return bool(o)
+            if isinstance(o, (_np.ndarray,)):
+                return o.tolist()
+
+        # Pandas types
+        if _pd is not None:
+            if isinstance(o, _pd.Timestamp):
+                return o.isoformat()
+            if isinstance(o, _pd.Timedelta):
+                return str(o)
+            if isinstance(o, (_pd.Series, _pd.Index)):
+                return o.tolist()
+
+        # Fall back to default behaviour
+        return super().default(o)
+
+
+def _make_json_serializable(obj):
+    """Recursively convert numpy / pandas objects to standard Python types.
+
+    This function ensures that any nested structure handed to json.dump will only
+    contain JSON-serializable Python data types (int, float, bool, str, list,
+    dict). It complements the encoder by proactively converting values.
+    """
+    # Local imports to avoid import-time dependency errors
+    try:
+        import numpy as _np
+    except Exception:
+        _np = None
+
+    try:
+        import pandas as _pd
+    except Exception:
+        _pd = None
+
+    # Recursively handle containers
+    if isinstance(obj, dict):
+        return {str(k): _make_json_serializable(v) for k, v in obj.items()}
+
+    if isinstance(obj, (list, tuple, set)):
+        return [_make_json_serializable(v) for v in obj]
+
+    # Numpy scalars and arrays
+    if _np is not None:
+        if isinstance(obj, _np.integer):
+            return int(obj)
+        if isinstance(obj, _np.floating):
+            return float(obj)
+        if isinstance(obj, _np.bool_):
+            return bool(obj)
+        if isinstance(obj, _np.ndarray):
+            return _make_json_serializable(obj.tolist())
+
+    # Pandas types
+    if _pd is not None:
+        if isinstance(obj, (_pd.Series, _pd.Index)):
+            return _make_json_serializable(obj.tolist())
+        if isinstance(obj, _pd.Timestamp):
+            return obj.isoformat()
+        if isinstance(obj, _pd.Timedelta):
+            return str(obj)
+
+    # Path-like objects
+    try:
+        from pathlib import Path as _Path
+        if isinstance(obj, _Path):
+            return str(obj)
+    except Exception:
+        pass
+
+    # Default fallback for primitives and unknown objects
+    return obj
 
 
 # Convenience function for quick saving
