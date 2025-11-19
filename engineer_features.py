@@ -27,7 +27,7 @@ def engineer_features(df):
     # Captures low-information, suspicious URLs with minimal domain structure.
     final_df['http_and_missing_domain_info'] = (
         (final_df['is_http'] == 1) &
-        (final_df['has_subdomain']) &
+        (final_df['has_subdomain'] == 0) &
         (final_df['length_sld'] <= 3)
     ).astype(bool)
 
@@ -65,7 +65,8 @@ def engineer_features(df):
     )
 
     # Normalized domain complexity score (0 to 1 scale)
-    max_complexity = final_df['num_subdomain'].max() + 1 + 2  # max subdomains + short TLD + IP
+    max_complexity = 15 + 1 + 2  # max subdomains + short TLD + IP
+    # max subdomains generously estimated to avoid data leakage
     final_df['domain_complexity_score'] = final_df['domain_complexity_score'] / max_complexity
 
     # ------------------------------
