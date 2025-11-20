@@ -1,0 +1,205 @@
+{
+  "experiment_name": "exp_3_bilstm",
+  "model_type": "BiLSTM",
+  "vectorizer": "CharTokenizer/Visualizer",
+  "vectorizer_params": {
+    "vocab_size": 101,
+    "max_len": 200
+  },
+  "model_params": {
+    "vocab_size": 101,
+    "embedding_dim": 64,
+    "hidden_dim": 128,
+    "num_layers": 2,
+    "dropout": 0.3
+  },
+  "timestamp": "2025-11-19 12:58:53",
+  "n_folds": 5,
+  "best_fold": 1,
+  "average_metrics": {
+    "accuracy": 0.9137043834262724,
+    "accuracy_std": 0.007838060627009641,
+    "precision": 0.9070143095711227,
+    "precision_std": 0.019058871434377563,
+    "recall": 0.9225571857325633,
+    "recall_std": 0.006874345941140946,
+    "f1": 0.9145405663259355,
+    "f1_std": 0.0066632913029403915,
+    "roc_auc": 0.9676628746886362,
+    "roc_auc_std": 0.005733036024513274
+  },
+  "fold_metrics": [
+    {
+      "fold": 1,
+      "loss": 0.043905658451639615,
+      "accuracy": 0.9240021869874249,
+      "precision": 0.9330357142857143,
+      "recall": 0.9136612021857924,
+      "f1": 0.9232468249585865,
+      "roc_auc": 0.9757673589936746,
+      "TP": 836,
+      "FP": 60,
+      "TN": 854,
+      "FN": 79,
+      "train_size": 7314,
+      "val_size": 1829
+    },
+    {
+      "fold": 2,
+      "loss": 0.048859400077994226,
+      "accuracy": 0.9065062875888463,
+      "precision": 0.885773624091381,
+      "recall": 0.9332603938730853,
+      "f1": 0.9088971763452317,
+      "roc_auc": 0.9678731570828998,
+      "TP": 853,
+      "FP": 110,
+      "TN": 805,
+      "FN": 61,
+      "train_size": 7314,
+      "val_size": 1829
+    },
+    {
+      "fold": 3,
+      "loss": 0.05090816948413327,
+      "accuracy": 0.9114270092946966,
+      "precision": 0.9,
+      "recall": 0.925601750547046,
+      "f1": 0.912621359223301,
+      "roc_auc": 0.967219093398381,
+      "TP": 846,
+      "FP": 94,
+      "TN": 821,
+      "FN": 68,
+      "train_size": 7314,
+      "val_size": 1829
+    },
+    {
+      "fold": 4,
+      "loss": 0.0610903701387948,
+      "accuracy": 0.9217724288840262,
+      "precision": 0.9259668508287293,
+      "recall": 0.9168490153172867,
+      "f1": 0.9213853765805388,
+      "roc_auc": 0.9695342089260663,
+      "TP": 838,
+      "FP": 67,
+      "TN": 847,
+      "FN": 76,
+      "train_size": 7315,
+      "val_size": 1828
+    },
+    {
+      "fold": 5,
+      "loss": 0.0766215846716647,
+      "accuracy": 0.9048140043763676,
+      "precision": 0.890295358649789,
+      "recall": 0.9234135667396062,
+      "f1": 0.9065520945220193,
+      "roc_auc": 0.9579205550421596,
+      "TP": 844,
+      "FP": 104,
+      "TN": 810,
+      "FN": 70,
+      "train_size": 7315,
+      "val_size": 1828
+    }
+  ],
+  "fold_models": [
+    {
+      "fold": 1,
+      "metrics": {
+        "fold": 1,
+        "loss": 0.043905658451639615,
+        "accuracy": 0.9240021869874249,
+        "precision": 0.9330357142857143,
+        "recall": 0.9136612021857924,
+        "f1": 0.9232468249585865,
+        "roc_auc": 0.9757673589936746,
+        "TP": 836,
+        "FP": 60,
+        "TN": 854,
+        "FN": 79,
+        "train_size": 7314,
+        "val_size": 1829
+      },
+      "pipeline_path": "pipeline_fold_1.pkl"
+    },
+    {
+      "fold": 2,
+      "metrics": {
+        "fold": 2,
+        "loss": 0.048859400077994226,
+        "accuracy": 0.9065062875888463,
+        "precision": 0.885773624091381,
+        "recall": 0.9332603938730853,
+        "f1": 0.9088971763452317,
+        "roc_auc": 0.9678731570828998,
+        "TP": 853,
+        "FP": 110,
+        "TN": 805,
+        "FN": 61,
+        "train_size": 7314,
+        "val_size": 1829
+      },
+      "pipeline_path": "pipeline_fold_2.pkl"
+    },
+    {
+      "fold": 3,
+      "metrics": {
+        "fold": 3,
+        "loss": 0.05090816948413327,
+        "accuracy": 0.9114270092946966,
+        "precision": 0.9,
+        "recall": 0.925601750547046,
+        "f1": 0.912621359223301,
+        "roc_auc": 0.967219093398381,
+        "TP": 846,
+        "FP": 94,
+        "TN": 821,
+        "FN": 68,
+        "train_size": 7314,
+        "val_size": 1829
+      },
+      "pipeline_path": "pipeline_fold_3.pkl"
+    },
+    {
+      "fold": 4,
+      "metrics": {
+        "fold": 4,
+        "loss": 0.0610903701387948,
+        "accuracy": 0.9217724288840262,
+        "precision": 0.9259668508287293,
+        "recall": 0.9168490153172867,
+        "f1": 0.9213853765805388,
+        "roc_auc": 0.9695342089260663,
+        "TP": 838,
+        "FP": 67,
+        "TN": 847,
+        "FN": 76,
+        "train_size": 7315,
+        "val_size": 1828
+      },
+      "pipeline_path": "pipeline_fold_4.pkl"
+    },
+    {
+      "fold": 5,
+      "metrics": {
+        "fold": 5,
+        "loss": 0.0766215846716647,
+        "accuracy": 0.9048140043763676,
+        "precision": 0.890295358649789,
+        "recall": 0.9234135667396062,
+        "f1": 0.9065520945220193,
+        "roc_auc": 0.9579205550421596,
+        "TP": 844,
+        "FP": 104,
+        "TN": 810,
+        "FN": 70,
+        "train_size": 7315,
+        "val_size": 1828
+      },
+      "pipeline_path": "pipeline_fold_5.pkl"
+    }
+  ]
+}
