@@ -1,0 +1,37 @@
+[
+  {
+    "fold": 1,
+    "n_features": 1,
+    "features": [
+      "numeric_features"
+    ]
+  },
+  {
+    "fold": 2,
+    "n_features": 1,
+    "features": [
+      "numeric_features"
+    ]
+  },
+  {
+    "fold": 3,
+    "n_features": 1,
+    "features": [
+      "numeric_features"
+    ]
+  },
+  {
+    "fold": 4,
+    "n_features": 1,
+    "features": [
+      "numeric_features"
+    ]
+  },
+  {
+    "fold": 5,
+    "n_features": 1,
+    "features": [
+      "numeric_features"
+    ]
+  }
+]
