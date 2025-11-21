@@ -1,0 +1,193 @@
+{
+  "experiment_name": "exp_1_combined_linear_svc_optuna",
+  "model_type": "LinearSVC",
+  "vectorizer": "CombinedFeatures",
+  "vectorizer_params": {
+    "tfidf": {
+      "max_features": 5000,
+      "analyzer": "char",
+      "ngram_range": [
+        3,
+        5
+      ]
+    },
+    "scaler": "StandardScaler"
+  },
+  "model_params": {
+    "C": 2.266814688078125,
+    "loss": "squared_hinge",
+    "dual": false,
+    "tol": 0.002146602798983493,
+    "max_iter": 10783,
+    "calibration_method": "sigmoid",
+    "max_features": 10000,
+    "ngram_min": 1,
+    "ngram_max": 5,
+    "random_state": 42,
+    "calibration_cv": 3
+  },
+  "timestamp": "2025-11-21 14:14:20",
+  "n_folds": 5,
+  "best_fold": 4,
+  "average_metrics": {
+    "accuracy": 0.9464075620952489,
+    "accuracy_std": 0.0038600129523629827,
+    "precision": 0.9507698552402847,
+    "precision_std": 0.005516215969232452,
+    "recall": 0.9415869713383793,
+    "recall_std": 0.00512634911384137,
+    "f1": 0.9461422638490797,
+    "f1_std": 0.0038848054955498952,
+    "roc_auc": 0.9870613173682339,
+    "roc_auc_std": 0.002136491650612364
+  },
+  "fold_metrics": [
+    {
+      "accuracy": 0.9486057955166758,
+      "precision": 0.9496166484118291,
+      "recall": 0.9475409836065574,
+      "f1": 0.9485776805251641,
+      "roc_auc": 0.9885927467087564,
+      "TP": 867,
+      "FP": 46,
+      "TN": 868,
+      "FN": 48,
+      "fold": 1
+    },
+    {
+      "accuracy": 0.946965554948059,
+      "precision": 0.9474260679079957,
+      "recall": 0.9463894967177243,
+      "f1": 0.9469074986316366,
+      "roc_auc": 0.9850390405471655,
+      "TP": 865,
+      "FP": 48,
+      "TN": 867,
+      "FN": 49,
+      "fold": 2
+    },
+    {
+      "accuracy": 0.9393110989611809,
+      "precision": 0.9446290143964563,
+      "recall": 0.9332603938730853,
+      "f1": 0.9389102916895983,
+      "roc_auc": 0.9865635948392344,
+      "TP": 853,
+      "FP": 50,
+      "TN": 865,
+      "FN": 61,
+      "fold": 3
+    },
+    {
+      "accuracy": 0.9507658643326039,
+      "precision": 0.9608501118568232,
+      "recall": 0.9398249452954048,
+      "f1": 0.9502212389380531,
+      "roc_auc": 0.990353078061183,
+      "TP": 859,
+      "FP": 35,
+      "TN": 879,
+      "FN": 55,
+      "fold": 4
+    },
+    {
+      "accuracy": 0.9463894967177243,
+      "precision": 0.9513274336283186,
+      "recall": 0.9409190371991247,
+      "f1": 0.9460946094609461,
+      "roc_auc": 0.9847581266848298,
+      "TP": 860,
+      "FP": 44,
+      "TN": 870,
+      "FN": 54,
+      "fold": 5
+    }
+  ],
+  "fold_models": [
+    {
+      "fold": 1,
+      "metrics": {
+        "accuracy": 0.9486057955166758,
+        "precision": 0.9496166484118291,
+        "recall": 0.9475409836065574,
+        "f1": 0.9485776805251641,
+        "roc_auc": 0.9885927467087564,
+        "TP": 867,
+        "FP": 46,
+        "TN": 868,
+        "FN": 48,
+        "fold": 1
+      },
+      "pipeline_path": "pipeline_fold_1.pkl",
+      "n_features": 10049
+    },
+    {
+      "fold": 2,
+      "metrics": {
+        "accuracy": 0.946965554948059,
+        "precision": 0.9474260679079957,
+        "recall": 0.9463894967177243,
+        "f1": 0.9469074986316366,
+        "roc_auc": 0.9850390405471655,
+        "TP": 865,
+        "FP": 48,
+        "TN": 867,
+        "FN": 49,
+        "fold": 2
+      },
+      "pipeline_path": "pipeline_fold_2.pkl",
+      "n_features": 10049
+    },
+    {
+      "fold": 3,
+      "metrics": {
+        "accuracy": 0.9393110989611809,
+        "precision": 0.9446290143964563,
+        "recall": 0.9332603938730853,
+        "f1": 0.9389102916895983,
+        "roc_auc": 0.9865635948392344,
+        "TP": 853,
+        "FP": 50,
+        "TN": 865,
+        "FN": 61,
+        "fold": 3
+      },
+      "pipeline_path": "pipeline_fold_3.pkl",
+      "n_features": 10049
+    },
+    {
+      "fold": 4,
+      "metrics": {
+        "accuracy": 0.9507658643326039,
+        "precision": 0.9608501118568232,
+        "recall": 0.9398249452954048,
+        "f1": 0.9502212389380531,
+        "roc_auc": 0.990353078061183,
+        "TP": 859,
+        "FP": 35,
+        "TN": 879,
+        "FN": 55,
+        "fold": 4
+      },
+      "pipeline_path": "pipeline_fold_4.pkl",
+      "n_features": 10049
+    },
+    {
+      "fold": 5,
+      "metrics": {
+        "accuracy": 0.9463894967177243,
+        "precision": 0.9513274336283186,
+        "recall": 0.9409190371991247,
+        "f1": 0.9460946094609461,
+        "roc_auc": 0.9847581266848298,
+        "TP": 860,
+        "FP": 44,
+        "TN": 870,
+        "FN": 54,
+        "fold": 5
+      },
+      "pipeline_path": "pipeline_fold_5.pkl",
+      "n_features": 10049
+    }
+  ]
+}
