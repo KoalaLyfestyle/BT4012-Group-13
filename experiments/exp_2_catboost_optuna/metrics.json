@@ -1,0 +1,237 @@
+{
+  "experiment_name": "exp_2_catboost_optuna",
+  "model_type": "CatBoost_Optuna",
+  "vectorizer": "Tfidf+SVD",
+  "vectorizer_params": {
+    "max_features": 10000,
+    "ngram_range": [
+      2,
+      5
+    ],
+    "n_components": 88
+  },
+  "model_params": {
+    "iterations": 1829,
+    "learning_rate": 0.05526068316585797,
+    "depth": 6,
+    "l2_leaf_reg": 0.08843744861674385,
+    "bootstrap_type": "Bernoulli",
+    "random_strength": 0.05514096618048006,
+    "leaf_estimation_iterations": 2,
+    "grow_policy": "SymmetricTree",
+    "subsample": 0.554882152952546,
+    "random_seed": 42,
+    "verbose": 0,
+    "task_type": "CPU"
+  },
+  "timestamp": "2025-11-21 15:08:34",
+  "n_folds": 5,
+  "best_fold": 4,
+  "average_metrics": {
+    "accuracy": 0.944001038460112,
+    "accuracy_std": 0.0038436975351240467,
+    "precision": 0.9457912772578331,
+    "precision_std": 0.00571221234717805,
+    "recall": 0.9420241298083246,
+    "recall_std": 0.0060858629223709375,
+    "f1": 0.9438829537128853,
+    "f1_std": 0.003874598091955599,
+    "roc_auc": 0.9865394060555739,
+    "roc_auc_std": 0.001977492727518565
+  },
+  "fold_metrics": [
+    {
+      "fold": 1,
+      "accuracy": 0.9436850738108256,
+      "precision": 0.9384449244060475,
+      "recall": 0.9497267759562842,
+      "f1": 0.9440521455730582,
+      "roc_auc": 0.9874101708696535,
+      "TP": 869,
+      "FP": 57,
+      "TN": 857,
+      "FN": 46,
+      "train_size": 7314,
+      "val_size": 1829
+    },
+    {
+      "fold": 2,
+      "accuracy": 0.9458720612356479,
+      "precision": 0.9453551912568307,
+      "recall": 0.9463894967177243,
+      "f1": 0.9458720612356479,
+      "roc_auc": 0.9868445911205176,
+      "TP": 865,
+      "FP": 50,
+      "TN": 865,
+      "FN": 49,
+      "train_size": 7314,
+      "val_size": 1829
+    },
+    {
+      "fold": 3,
+      "accuracy": 0.9409513395297977,
+      "precision": 0.9467849223946785,
+      "recall": 0.9343544857768052,
+      "f1": 0.9405286343612335,
+      "roc_auc": 0.9859549688512633,
+      "TP": 854,
+      "FP": 48,
+      "TN": 867,
+      "FN": 60,
+      "train_size": 7314,
+      "val_size": 1829
+    },
+    {
+      "fold": 4,
+      "accuracy": 0.950218818380744,
+      "precision": 0.955703211517165,
+      "recall": 0.9442013129102844,
+      "f1": 0.9499174463401211,
+      "roc_auc": 0.9892589861574631,
+      "TP": 863,
+      "FP": 40,
+      "TN": 874,
+      "FN": 51,
+      "train_size": 7315,
+      "val_size": 1828
+    },
+    {
+      "fold": 5,
+      "accuracy": 0.9392778993435449,
+      "precision": 0.9426681367144433,
+      "recall": 0.9354485776805251,
+      "f1": 0.9390444810543658,
+      "roc_auc": 0.9832283132789719,
+      "TP": 855,
+      "FP": 52,
+      "TN": 862,
+      "FN": 59,
+      "train_size": 7315,
+      "val_size": 1828
+    }
+  ],
+  "fold_models": [
+    {
+      "fold": 1,
+      "metrics": {
+        "fold": 1,
+        "accuracy": 0.9436850738108256,
+        "precision": 0.9384449244060475,
+        "recall": 0.9497267759562842,
+        "f1": 0.9440521455730582,
+        "roc_auc": 0.9874101708696535,
+        "TP": 869,
+        "FP": 57,
+        "TN": 857,
+        "FN": 46,
+        "train_size": 7314,
+        "val_size": 1829
+      },
+      "pipeline_path": "pipeline_fold_1.pkl",
+      "n_features": 160
+    },
+    {
+      "fold": 2,
+      "metrics": {
+        "fold": 2,
+        "accuracy": 0.9458720612356479,
+        "precision": 0.9453551912568307,
+        "recall": 0.9463894967177243,
+        "f1": 0.9458720612356479,
+        "roc_auc": 0.9868445911205176,
+        "TP": 865,
+        "FP": 50,
+        "TN": 865,
+        "FN": 49,
+        "train_size": 7314,
+        "val_size": 1829
+      },
+      "pipeline_path": "pipeline_fold_2.pkl",
+      "n_features": 160
+    },
+    {
+      "fold": 3,
+      "metrics": {
+        "fold": 3,
+        "accuracy": 0.9409513395297977,
+        "precision": 0.9467849223946785,
+        "recall": 0.9343544857768052,
+        "f1": 0.9405286343612335,
+        "roc_auc": 0.9859549688512633,
+        "TP": 854,
+        "FP": 48,
+        "TN": 867,
+        "FN": 60,
+        "train_size": 7314,
+        "val_size": 1829
+      },
+      "pipeline_path": "pipeline_fold_3.pkl",
+      "n_features": 160
+    },
+    {
+      "fold": 4,
+      "metrics": {
+        "fold": 4,
+        "accuracy": 0.950218818380744,
+        "precision": 0.955703211517165,
+        "recall": 0.9442013129102844,
+        "f1": 0.9499174463401211,
+        "roc_auc": 0.9892589861574631,
+        "TP": 863,
+        "FP": 40,
+        "TN": 874,
+        "FN": 51,
+        "train_size": 7315,
+        "val_size": 1828
+      },
+      "pipeline_path": "pipeline_fold_4.pkl",
+      "n_features": 160
+    },
+    {
+      "fold": 5,
+      "metrics": {
+        "fold": 5,
+        "accuracy": 0.9392778993435449,
+        "precision": 0.9426681367144433,
+        "recall": 0.9354485776805251,
+        "f1": 0.9390444810543658,
+        "roc_auc": 0.9832283132789719,
+        "TP": 855,
+        "FP": 52,
+        "TN": 862,
+        "FN": 59,
+        "train_size": 7315,
+        "val_size": 1828
+      },
+      "pipeline_path": "pipeline_fold_5.pkl",
+      "n_features": 160
+    }
+  ],
+  "optuna_study": {
+    "n_trials": 60,
+    "best_params": {
+      "iterations": 1829,
+      "learning_rate": 0.05526068316585797,
+      "depth": 6,
+      "l2_leaf_reg": 0.08843744861674385,
+      "bootstrap_type": "Bernoulli",
+      "random_strength": 0.05514096618048006,
+      "leaf_estimation_iterations": 2,
+      "grow_policy": "SymmetricTree",
+      "subsample": 0.554882152952546,
+      "max_features": 10000,
+      "ngram_min": 2,
+      "ngram_max": 5,
+      "n_svd_components": 88
+    },
+    "best_value": 0.9866262837372476,
+    "study_path": "optuna_study.pkl",
+    "tfidf_max_features": 10000,
+    "tfidf_ngram_range": [
+      2,
+      5
+    ],
+    "n_svd_components": 88
+  }
+}
