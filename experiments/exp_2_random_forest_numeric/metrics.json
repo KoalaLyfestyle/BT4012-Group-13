@@ -1,13 +1,13 @@
 {
   "experiment_name": "exp_2_random_forest_numeric",
   "model_type": "RandomForest",
-  "vectorizer": "NumericFeatures",
+  "vectorizer": "Numeric",
   "vectorizer_params": {},
   "model_params": {
     "random_state": 42,
     "verbose": 0
   },
-  "timestamp": "2025-11-21 11:28:26",
+  "timestamp": "2025-11-21 13:01:04",
   "n_folds": 5,
   "best_fold": 1,
   "average_metrics": {
