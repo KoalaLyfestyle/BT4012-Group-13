@@ -1,0 +1,206 @@
+{
+  "experiment_name": "exp_2_lgbm_all",
+  "model_type": "LightGBM",
+  "vectorizer": "TfidfSVD",
+  "vectorizer_params": {
+    "tfidf": {
+      "max_features": 5000,
+      "analyzer": "char",
+      "ngram_range": [
+        3,
+        5
+      ]
+    },
+    "svd": {
+      "n_components": 100
+    }
+  },
+  "model_params": {
+    "random_state": 42,
+    "verbose": -1
+  },
+  "timestamp": "2025-11-21 11:58:33",
+  "n_folds": 5,
+  "best_fold": 4,
+  "average_metrics": {
+    "accuracy": 0.9375479898977451,
+    "accuracy_std": 0.004577958724533575,
+    "precision": 0.9393659991087748,
+    "precision_std": 0.0026155145740994435,
+    "recall": 0.9354622089894896,
+    "recall_std": 0.008191121786508998,
+    "f1": 0.9373949498456732,
+    "f1_std": 0.004798214809199949,
+    "roc_auc": 0.9842990193950621,
+    "roc_auc_std": 0.0014794128102686341
+  },
+  "fold_metrics": [
+    {
+      "fold": 1,
+      "accuracy": 0.9365773646801531,
+      "precision": 0.935659760087241,
+      "recall": 0.9377049180327869,
+      "f1": 0.9366812227074236,
+      "roc_auc": 0.9853666702538533,
+      "TP": 858,
+      "FP": 59,
+      "TN": 855,
+      "FN": 57,
+      "train_size": 7314,
+      "val_size": 1829
+    },
+    {
+      "fold": 2,
+      "accuracy": 0.9442318206670312,
+      "precision": 0.941304347826087,
+      "recall": 0.9474835886214442,
+      "f1": 0.9443838604143948,
+      "roc_auc": 0.9842881228252681,
+      "TP": 866,
+      "FP": 54,
+      "TN": 861,
+      "FN": 48,
+      "train_size": 7314,
+      "val_size": 1829
+    },
+    {
+      "fold": 3,
+      "accuracy": 0.9305631492618918,
+      "precision": 0.9367369589345172,
+      "recall": 0.9234135667396062,
+      "f1": 0.9300275482093664,
+      "roc_auc": 0.9829512979636738,
+      "TP": 844,
+      "FP": 57,
+      "TN": 858,
+      "FN": 70,
+      "train_size": 7314,
+      "val_size": 1829
+    },
+    {
+      "fold": 4,
+      "accuracy": 0.9403719912472648,
+      "precision": 0.9418221734357849,
+      "recall": 0.9387308533916849,
+      "f1": 0.9402739726027397,
+      "roc_auc": 0.9864375697274108,
+      "TP": 858,
+      "FP": 53,
+      "TN": 861,
+      "FN": 56,
+      "train_size": 7315,
+      "val_size": 1828
+    },
+    {
+      "fold": 5,
+      "accuracy": 0.9359956236323851,
+      "precision": 0.9413067552602437,
+      "recall": 0.9299781181619255,
+      "f1": 0.9356081452944414,
+      "roc_auc": 0.9824514362051051,
+      "TP": 850,
+      "FP": 53,
+      "TN": 861,
+      "FN": 64,
+      "train_size": 7315,
+      "val_size": 1828
+    }
+  ],
+  "fold_models": [
+    {
+      "fold": 1,
+      "metrics": {
+        "fold": 1,
+        "accuracy": 0.9365773646801531,
+        "precision": 0.935659760087241,
+        "recall": 0.9377049180327869,
+        "f1": 0.9366812227074236,
+        "roc_auc": 0.9853666702538533,
+        "TP": 858,
+        "FP": 59,
+        "TN": 855,
+        "FN": 57,
+        "train_size": 7314,
+        "val_size": 1829
+      },
+      "pipeline_path": "pipeline_fold_1.pkl",
+      "n_features": 172
+    },
+    {
+      "fold": 2,
+      "metrics": {
+        "fold": 2,
+        "accuracy": 0.9442318206670312,
+        "precision": 0.941304347826087,
+        "recall": 0.9474835886214442,
+        "f1": 0.9443838604143948,
+        "roc_auc": 0.9842881228252681,
+        "TP": 866,
+        "FP": 54,
+        "TN": 861,
+        "FN": 48,
+        "train_size": 7314,
+        "val_size": 1829
+      },
+      "pipeline_path": "pipeline_fold_2.pkl",
+      "n_features": 172
+    },
+    {
+      "fold": 3,
+      "metrics": {
+        "fold": 3,
+        "accuracy": 0.9305631492618918,
+        "precision": 0.9367369589345172,
+        "recall": 0.9234135667396062,
+        "f1": 0.9300275482093664,
+        "roc_auc": 0.9829512979636738,
+        "TP": 844,
+        "FP": 57,
+        "TN": 858,
+        "FN": 70,
+        "train_size": 7314,
+        "val_size": 1829
+      },
+      "pipeline_path": "pipeline_fold_3.pkl",
+      "n_features": 172
+    },
+    {
+      "fold": 4,
+      "metrics": {
+        "fold": 4,
+        "accuracy": 0.9403719912472648,
+        "precision": 0.9418221734357849,
+        "recall": 0.9387308533916849,
+        "f1": 0.9402739726027397,
+        "roc_auc": 0.9864375697274108,
+        "TP": 858,
+        "FP": 53,
+        "TN": 861,
+        "FN": 56,
+        "train_size": 7315,
+        "val_size": 1828
+      },
+      "pipeline_path": "pipeline_fold_4.pkl",
+      "n_features": 172
+    },
+    {
+      "fold": 5,
+      "metrics": {
+        "fold": 5,
+        "accuracy": 0.9359956236323851,
+        "precision": 0.9413067552602437,
+        "recall": 0.9299781181619255,
+        "f1": 0.9356081452944414,
+        "roc_auc": 0.9824514362051051,
+        "TP": 850,
+        "FP": 53,
+        "TN": 861,
+        "FN": 64,
+        "train_size": 7315,
+        "val_size": 1828
+      },
+      "pipeline_path": "pipeline_fold_5.pkl",
+      "n_features": 172
+    }
+  ]
+}
