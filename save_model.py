@@ -488,22 +488,29 @@ class ModelSaver:
         else:
             raise ValueError(f"Unsupported save format: {save_format}")
         
-        # Try to extract number of features if available
+        # 1. Handle explicit feature names
+        if feature_names is not None:
+            self._save_single_fold_features(fold_num, feature_names)
+            model_info["n_features"] = len(feature_names)
+
+        # 2. Try to extract from vectorizer if not provided
         try:
             if hasattr(model, 'named_steps') and 'vectorizer' in model.named_steps:
                 vectorizer = model.named_steps['vectorizer']
                 if hasattr(vectorizer, 'get_feature_names_out'):
                     n_features = len(vectorizer.get_feature_names_out())
-                    model_info["n_features"] = n_features
+                    if "n_features" not in model_info:
+                        model_info["n_features"] = n_features
                     
-                    # Save feature names if this is the first fold
-                    if fold_num == 1 or feature_names is not None:
+                    # Save from vectorizer if not already saved via explicit feature_names
+                    if fold_num == 1 and feature_names is None:
                         self._save_single_fold_features(
                             fold_num, 
-                            feature_names or vectorizer.get_feature_names_out().tolist()
+                            vectorizer.get_feature_names_out().tolist()
                         )
             elif hasattr(model, 'n_features_in_'):
-                model_info["n_features"] = model.n_features_in_
+                if "n_features" not in model_info:
+                    model_info["n_features"] = model.n_features_in_
         except:
             pass
         
@@ -598,15 +605,9 @@ class ModelSaver:
         # Add this fold's features
         fold_info = {
             "fold": fold_num,
-            "n_features": len(feature_names)
+            "n_features": len(feature_names),
+            "features": feature_names
         }
-        
-        # Only include top features if list is very long
-        if len(feature_names) > 1000:
-            fold_info["features"] = feature_names[:1000]
-            fold_info["note"] = f"Showing first 1000 of {len(feature_names)} features"
-        else:
-            fold_info["features"] = feature_names
         
         feature_data.append(fold_info)
         
@@ -626,15 +627,8 @@ class ModelSaver:
             fold_info = {
                 "fold": fold_data.get("fold"),
                 "n_features": fold_data.get("n_features", len(fold_data.get("features", []))),
+                "features": fold_data.get("features", [])
             }
-            
-            # Only include top features if list is very long
-            features = fold_data.get("features", [])
-            if len(features) > 1000:
-                fold_info["features"] = features[:1000]
-                fold_info["note"] = f"Showing first 1000 of {len(features)} features"
-            else:
-                fold_info["features"] = features
             
             feature_data.append(fold_info)
         

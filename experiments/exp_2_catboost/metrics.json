@@ -8,7 +8,7 @@
     "verbose": 0,
     "task_type": "CPU"
   },
-  "timestamp": "2025-11-20 14:46:51",
+  "timestamp": "2025-11-21 09:57:52",
   "n_folds": 5,
   "best_fold": 4,
   "average_metrics": {

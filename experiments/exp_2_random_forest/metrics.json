@@ -7,7 +7,7 @@
     "random_state": 42,
     "verbose": 0
   },
-  "timestamp": "2025-11-20 14:46:23",
+  "timestamp": "2025-11-21 09:57:35",
   "n_folds": 5,
   "best_fold": 1,
   "average_metrics": {

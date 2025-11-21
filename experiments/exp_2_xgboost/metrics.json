@@ -6,7 +6,7 @@
   "model_params": {
     "random_state": 42
   },
-  "timestamp": "2025-11-20 14:46:26",
+  "timestamp": "2025-11-21 09:57:36",
   "n_folds": 5,
   "best_fold": 1,
   "average_metrics": {
