@@ -1,0 +1,222 @@
+{
+  "experiment_name": "exp_4_deberta_url_only",
+  "model_type": "DeBERTa Transformer",
+  "vectorizer": "DeBERTa Tokenizer",
+  "vectorizer_params": {
+    "model": "microsoft/deberta-v3-base",
+    "max_len": 256
+  },
+  "model_params": {
+    "epochs": 2,
+    "batch_size": 16
+  },
+  "timestamp": "2025-11-21 08:39:25",
+  "n_folds": 5,
+  "best_fold": 1,
+  "average_metrics": {
+    "accuracy": 0.9557041728629316,
+    "accuracy_std": 0.004343284692208936,
+    "precision": 0.9707189021343228,
+    "precision_std": 0.006945290341705675,
+    "recall": 0.9398347502720282,
+    "recall_std": 0.010347775828217777,
+    "f1": 0.9549661978190868,
+    "f1_std": 0.004577381429570656,
+    "roc_auc": 0.9911678623562761,
+    "roc_auc_std": 0.0012368021705190745
+  },
+  "fold_metrics": [
+    {
+      "loss": 0.13571447134017944,
+      "accuracy": 0.9617277200656096,
+      "precision": 0.9678848283499446,
+      "recall": 0.9551912568306011,
+      "f1": 0.9614961496149615,
+      "roc_auc": 0.9923545096913824,
+      "TP": 874,
+      "FP": 29,
+      "TN": 885,
+      "FN": 41,
+      "runtime": 8.2365,
+      "samples_per_second": 222.061,
+      "steps_per_second": 7.042,
+      "epoch": 2.0,
+      "fold": 1
+    },
+    {
+      "loss": 0.22036699950695038,
+      "accuracy": 0.9513395297977036,
+      "precision": 0.9588431590656284,
+      "recall": 0.9431072210065645,
+      "f1": 0.9509100937672367,
+      "roc_auc": 0.9888988532960266,
+      "TP": 862,
+      "FP": 37,
+      "TN": 878,
+      "FN": 52,
+      "runtime": 8.2605,
+      "samples_per_second": 221.415,
+      "steps_per_second": 7.021,
+      "epoch": 2.0,
+      "fold": 2
+    },
+    {
+      "loss": 0.1778380572795868,
+      "accuracy": 0.950792782941498,
+      "precision": 0.9735632183908046,
+      "recall": 0.9266958424507659,
+      "f1": 0.9495515695067265,
+      "roc_auc": 0.9910248592029272,
+      "TP": 847,
+      "FP": 23,
+      "TN": 892,
+      "FN": 67,
+      "runtime": 8.2568,
+      "samples_per_second": 221.513,
+      "steps_per_second": 7.024,
+      "epoch": 2.0,
+      "fold": 3
+    },
+    {
+      "loss": 0.15614178776741028,
+      "accuracy": 0.9595185995623632,
+      "precision": 0.9740406320541761,
+      "recall": 0.9442013129102844,
+      "f1": 0.9588888888888889,
+      "roc_auc": 0.9921809537033934,
+      "TP": 863,
+      "FP": 23,
+      "TN": 891,
+      "FN": 51,
+      "runtime": 8.2723,
+      "samples_per_second": 220.979,
+      "steps_per_second": 7.011,
+      "epoch": 2.0,
+      "fold": 4
+    },
+    {
+      "loss": 0.1736678183078766,
+      "accuracy": 0.9551422319474836,
+      "precision": 0.9792626728110599,
+      "recall": 0.9299781181619255,
+      "f1": 0.9539842873176206,
+      "roc_auc": 0.991380135887651,
+      "TP": 850,
+      "FP": 18,
+      "TN": 896,
+      "FN": 64,
+      "runtime": 8.2578,
+      "samples_per_second": 221.366,
+      "steps_per_second": 7.024,
+      "epoch": 2.0,
+      "fold": 5
+    }
+  ],
+  "fold_models": [
+    {
+      "fold": 1,
+      "metrics": {
+        "loss": 0.13571447134017944,
+        "accuracy": 0.9617277200656096,
+        "precision": 0.9678848283499446,
+        "recall": 0.9551912568306011,
+        "f1": 0.9614961496149615,
+        "roc_auc": 0.9923545096913824,
+        "TP": 874,
+        "FP": 29,
+        "TN": 885,
+        "FN": 41,
+        "runtime": 8.2365,
+        "samples_per_second": 222.061,
+        "steps_per_second": 7.042,
+        "epoch": 2.0,
+        "fold": 1
+      },
+      "model_path": "transformer_fold_1"
+    },
+    {
+      "fold": 2,
+      "metrics": {
+        "loss": 0.22036699950695038,
+        "accuracy": 0.9513395297977036,
+        "precision": 0.9588431590656284,
+        "recall": 0.9431072210065645,
+        "f1": 0.9509100937672367,
+        "roc_auc": 0.9888988532960266,
+        "TP": 862,
+        "FP": 37,
+        "TN": 878,
+        "FN": 52,
+        "runtime": 8.2605,
+        "samples_per_second": 221.415,
+        "steps_per_second": 7.021,
+        "epoch": 2.0,
+        "fold": 2
+      },
+      "model_path": "transformer_fold_2"
+    },
+    {
+      "fold": 3,
+      "metrics": {
+        "loss": 0.1778380572795868,
+        "accuracy": 0.950792782941498,
+        "precision": 0.9735632183908046,
+        "recall": 0.9266958424507659,
+        "f1": 0.9495515695067265,
+        "roc_auc": 0.9910248592029272,
+        "TP": 847,
+        "FP": 23,
+        "TN": 892,
+        "FN": 67,
+        "runtime": 8.2568,
+        "samples_per_second": 221.513,
+        "steps_per_second": 7.024,
+        "epoch": 2.0,
+        "fold": 3
+      },
+      "model_path": "transformer_fold_3"
+    },
+    {
+      "fold": 4,
+      "metrics": {
+        "loss": 0.15614178776741028,
+        "accuracy": 0.9595185995623632,
+        "precision": 0.9740406320541761,
+        "recall": 0.9442013129102844,
+        "f1": 0.9588888888888889,
+        "roc_auc": 0.9921809537033934,
+        "TP": 863,
+        "FP": 23,
+        "TN": 891,
+        "FN": 51,
+        "runtime": 8.2723,
+        "samples_per_second": 220.979,
+        "steps_per_second": 7.011,
+        "epoch": 2.0,
+        "fold": 4
+      },
+      "model_path": "transformer_fold_4"
+    },
+    {
+      "fold": 5,
+      "metrics": {
+        "loss": 0.1736678183078766,
+        "accuracy": 0.9551422319474836,
+        "precision": 0.9792626728110599,
+        "recall": 0.9299781181619255,
+        "f1": 0.9539842873176206,
+        "roc_auc": 0.991380135887651,
+        "TP": 850,
+        "FP": 18,
+        "TN": 896,
+        "FN": 64,
+        "runtime": 8.2578,
+        "samples_per_second": 221.366,
+        "steps_per_second": 7.024,
+        "epoch": 2.0,
+        "fold": 5
+      },
+      "model_path": "transformer_fold_5"
+    }
+  ]
+}
