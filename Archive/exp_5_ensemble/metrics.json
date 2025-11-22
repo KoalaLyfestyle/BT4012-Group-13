@@ -1,0 +1,23 @@
+{
+    "simple_average_auc": 0.986215543883967,
+    "weighted_average_auc": 0.9864552727233751,
+    "stacking_train_auc": 0.9872793465900989,
+    "models_used": [
+        "lr_combined",
+        "svm_combined",
+        "rf_all",
+        "xgb_all",
+        "charcnn",
+        "bilstm",
+        "hybrid"
+    ],
+    "weights": {
+        "lr_combined": 1,
+        "svm_combined": 1.5,
+        "rf_all": 1,
+        "xgb_all": 2,
+        "charcnn": 1,
+        "bilstm": 1,
+        "hybrid": 1
+    }
+}

@@ -38,6 +38,10 @@ EXPERIMENTS = {
     "Transformer": [
         "exp_4_deberta_url_only",
         "exp_4_deberta_url_features"
+    ],
+    "Ensemble": [
+        "exp_5_simple_avg",
+        "exp_5_weighted_avg"
     ]
 }
 
@@ -145,6 +149,40 @@ def create_metrics_table():
     for group, exp_list in EXPERIMENTS.items():
         for exp_name in exp_list:
             data = load_metrics(exp_name)
+            
+            # Handle ensemble experiments (no metrics.json file)
+            if not data and group == "Ensemble":
+                # Ensemble experiments only have test metrics
+                test_metrics = {}
+                if y_true is not None:
+                    test_metrics = evaluate_test_set(exp_name, y_true) or {}
+                
+                if test_metrics:
+                    row = {
+                        "Group": group,
+                        "Experiment": exp_name,
+                        "Model": "Ensemble",
+                        "Vectorizer": "N/A",
+                        
+                        # CV Metrics - N/A for ensemble
+                        "CV ROC AUC": "N/A",
+                        "CV Recall": "N/A",
+                        "CV F1": "N/A",
+                        
+                        # Test Metrics
+                        "Test ROC AUC": f"{test_metrics.get('roc_auc', 0):.4f}",
+                        "Test Recall": f"{test_metrics.get('recall', 0):.4f}",
+                        "Test F1": f"{test_metrics.get('f1', 0):.4f}",
+                        
+                        # Raw values for plotting
+                        "_cv_roc_auc_val": 0,
+                        "_test_roc_auc_val": test_metrics.get('roc_auc', 0),
+                        "_cv_recall_val": 0,
+                        "_test_recall_val": test_metrics.get('recall', 0)
+                    }
+                    all_metrics.append(row)
+                continue
+            
             if not data:
                 continue
                 
@@ -222,8 +260,30 @@ def plot_cv_roc_auc_boxplot():
 def plot_cv_vs_test_performance(df_metrics):
     print("\n=== Creating CV vs Test Performance Plots ===")
     
+    # Get test labels for ensemble experiments
+    y_true = get_test_labels()
+    
     # Filter out rows without test metrics
     df_plot = df_metrics[df_metrics["Test ROC AUC"] != "N/A"].copy()
+    
+    # Add ensemble experiments if they have prediction files
+    ensemble_data = []
+    if y_true is not None:
+        for exp_name in EXPERIMENTS.get("Ensemble", []):
+            test_metrics = evaluate_test_set(exp_name, y_true)
+            if test_metrics:
+                ensemble_data.append({
+                    "Experiment": exp_name,
+                    "Group": "Ensemble",
+                    "_cv_roc_auc_val": 0,  # No CV metrics
+                    "_test_roc_auc_val": test_metrics.get("roc_auc", 0),
+                    "_cv_recall_val": 0,  # No CV metrics
+                    "_test_recall_val": test_metrics.get("recall", 0)
+                })
+    
+    if ensemble_data:
+        df_ensemble = pd.DataFrame(ensemble_data)
+        df_plot = pd.concat([df_plot, df_ensemble], ignore_index=True)
     
     if df_plot.empty:
         print("No test metrics available for plotting.")
@@ -233,12 +293,15 @@ def plot_cv_vs_test_performance(df_metrics):
     # ROC AUC
     roc_data = []
     for _, row in df_plot.iterrows():
-        roc_data.append({
-            "Experiment": row["Experiment"],
-            "Group": row["Group"],
-            "Metric Type": "CV",
-            "Score": row["_cv_roc_auc_val"]
-        })
+        # Only add CV bar if CV value exists (non-zero for non-ensemble)
+        if row["_cv_roc_auc_val"] > 0:
+            roc_data.append({
+                "Experiment": row["Experiment"],
+                "Group": row["Group"],
+                "Metric Type": "CV",
+                "Score": row["_cv_roc_auc_val"]
+            })
+        # Always add test bar
         roc_data.append({
             "Experiment": row["Experiment"],
             "Group": row["Group"],
@@ -249,7 +312,7 @@ def plot_cv_vs_test_performance(df_metrics):
     df_roc = pd.DataFrame(roc_data)
     
     # Plot ROC AUC
-    plt.figure(figsize=(15, 8))
+    plt.figure(figsize=(16, 8))
     sns.barplot(data=df_roc, x="Experiment", y="Score", hue="Metric Type", palette="muted")
     plt.xticks(rotation=45, ha="right")
     plt.ylim(0.8, 1.0) # Zoom in as scores are likely high
@@ -261,12 +324,15 @@ def plot_cv_vs_test_performance(df_metrics):
     # Recall
     recall_data = []
     for _, row in df_plot.iterrows():
-        recall_data.append({
-            "Experiment": row["Experiment"],
-            "Group": row["Group"],
-            "Metric Type": "CV",
-            "Score": row["_cv_recall_val"]
-        })
+        # Only add CV bar if CV value exists (non-zero for non-ensemble)
+        if row["_cv_recall_val"] > 0:
+            recall_data.append({
+                "Experiment": row["Experiment"],
+                "Group": row["Group"],
+                "Metric Type": "CV",
+                "Score": row["_cv_recall_val"]
+            })
+        # Always add test bar
         recall_data.append({
             "Experiment": row["Experiment"],
             "Group": row["Group"],
@@ -277,7 +343,7 @@ def plot_cv_vs_test_performance(df_metrics):
     df_recall = pd.DataFrame(recall_data)
     
     # Plot Recall
-    plt.figure(figsize=(15, 8))
+    plt.figure(figsize=(16, 8))
     sns.barplot(data=df_recall, x="Experiment", y="Score", hue="Metric Type", palette="pastel")
     plt.xticks(rotation=45, ha="right")
     plt.ylim(0.7, 1.0)
@@ -458,9 +524,151 @@ def plot_submission_distributions():
     plt.savefig(ARTIFACTS_PATH / "submission_distribution_boxplot.png")
     print(f"Saved {ARTIFACTS_PATH / 'submission_distribution_boxplot.png'}")
 
+def plot_feature_type_comparison(df_metrics):
+    print("\n=== Creating Feature Type Comparison Plots ===")
+    
+    # Define feature type groups
+    FEATURE_GROUPS = {
+        "Engineered Features": [
+            "exp_1_numeric_lr",
+            "exp_2_random_forest_numeric",
+            "exp_3_mlp_baseline"
+        ],
+        "URL Only": [
+            "exp_1_tfidf_lr",
+            "exp_3_charcnn",
+            "exp_3_bilstm",
+            "exp_4_deberta_url_only"
+        ],
+        "Combined Features": [
+            "exp_1_combined_lr",
+            "exp_1_combined_svm",
+            "exp_1_combined_linear_svc_optuna",
+            "exp_2_random_forest_all",
+            "exp_2_xgboost_all",
+            "exp_2_lgbm_all",
+            "exp_2_catboost_all",
+            "exp_2_catboost_optuna",
+            "exp_3_hybrid",
+            "exp_4_deberta_url_features",
+            "exp_5_simple_avg",
+            "exp_5_weighted_avg"
+        ]
+    }
+    
+    # Get test labels for ensemble experiments
+    y_true = get_test_labels()
+    
+    # Prepare data
+    feature_type_data = []
+    
+    for feature_type, exp_list in FEATURE_GROUPS.items():
+        for exp_name in exp_list:
+            # Try to get from df_metrics first
+            row = df_metrics[df_metrics["Experiment"] == exp_name]
+            
+            if not row.empty and row.iloc[0]["Test ROC AUC"] != "N/A":
+                feature_type_data.append({
+                    "Feature Type": feature_type,
+                    "Experiment": exp_name,
+                    "Test ROC AUC": row.iloc[0]["_test_roc_auc_val"],
+                    "Test Recall": row.iloc[0]["_test_recall_val"]
+                })
+            elif y_true is not None:
+                # Try to evaluate test set (for ensemble experiments)
+                test_metrics = evaluate_test_set(exp_name, y_true)
+                if test_metrics:
+                    feature_type_data.append({
+                        "Feature Type": feature_type,
+                        "Experiment": exp_name,
+                        "Test ROC AUC": test_metrics.get("roc_auc", 0),
+                        "Test Recall": test_metrics.get("recall", 0)
+                    })
+    
+    if not feature_type_data:
+        print("No test metrics available for feature type comparison")
+        return
+    
+    df_feature = pd.DataFrame(feature_type_data)
+    
+    # Create figure with two subplots
+    fig, axes = plt.subplots(1, 2, figsize=(18, 7))
+    
+    # Plot 1: ROC AUC by Feature Type
+    sns.boxplot(data=df_feature, x="Feature Type", y="Test ROC AUC", ax=axes[0], palette="Set2")
+    sns.stripplot(data=df_feature, x="Feature Type", y="Test ROC AUC", ax=axes[0], 
+                  color="black", alpha=0.5, size=8)
+    axes[0].set_title("Test ROC AUC by Feature Type", fontsize=14, fontweight='bold')
+    axes[0].set_ylabel("Test ROC AUC", fontsize=12)
+    axes[0].set_xlabel("Feature Type", fontsize=12)
+    axes[0].set_ylim(0.92, 1.0)
+    axes[0].grid(axis='y', alpha=0.3)
+    
+    # Plot 2: Recall by Feature Type
+    sns.boxplot(data=df_feature, x="Feature Type", y="Test Recall", ax=axes[1], palette="Set2")
+    sns.stripplot(data=df_feature, x="Feature Type", y="Test Recall", ax=axes[1], 
+                  color="black", alpha=0.5, size=8)
+    axes[1].set_title("Test Recall by Feature Type", fontsize=14, fontweight='bold')
+    axes[1].set_ylabel("Test Recall", fontsize=12)
+    axes[1].set_xlabel("Feature Type", fontsize=12)
+    axes[1].set_ylim(0.84, 0.98)
+    axes[1].grid(axis='y', alpha=0.3)
+    
+    plt.tight_layout()
+    plt.savefig(ARTIFACTS_PATH / "feature_type_comparison.png", dpi=300)
+    print(f"Saved {ARTIFACTS_PATH / 'feature_type_comparison.png'}")
+    
+    # Create a detailed bar plot showing all experiments grouped by feature type
+    fig, axes = plt.subplots(2, 1, figsize=(16, 12))
+    
+    # Sort by feature type for better visualization
+    df_feature_sorted = df_feature.sort_values(["Feature Type", "Test ROC AUC"], ascending=[True, False])
+    
+    # Plot 1: ROC AUC
+    colors = {"Engineered Features": "#8dd3c7", "URL Only": "#fb8072", "Combined Features": "#80b1d3"}
+    bar_colors = [colors[ft] for ft in df_feature_sorted["Feature Type"]]
+    
+    axes[0].bar(range(len(df_feature_sorted)), df_feature_sorted["Test ROC AUC"], color=bar_colors)
+    axes[0].set_xticks(range(len(df_feature_sorted)))
+    axes[0].set_xticklabels(df_feature_sorted["Experiment"], rotation=45, ha="right", fontsize=9)
+    axes[0].set_ylabel("Test ROC AUC", fontsize=12)
+    axes[0].set_title("Test ROC AUC by Experiment (Grouped by Feature Type)", fontsize=14, fontweight='bold')
+    axes[0].set_ylim(0.92, 1.0)
+    axes[0].grid(axis='y', alpha=0.3)
+    
+    # Add legend
+    from matplotlib.patches import Patch
+    legend_elements = [Patch(facecolor=colors[ft], label=ft) for ft in colors.keys()]
+    axes[0].legend(handles=legend_elements, loc='lower right')
+    
+    # Plot 2: Recall
+    axes[1].bar(range(len(df_feature_sorted)), df_feature_sorted["Test Recall"], color=bar_colors)
+    axes[1].set_xticks(range(len(df_feature_sorted)))
+    axes[1].set_xticklabels(df_feature_sorted["Experiment"], rotation=45, ha="right", fontsize=9)
+    axes[1].set_ylabel("Test Recall", fontsize=12)
+    axes[1].set_title("Test Recall by Experiment (Grouped by Feature Type)", fontsize=14, fontweight='bold')
+    axes[1].set_ylim(0.84, 0.98)
+    axes[1].grid(axis='y', alpha=0.3)
+    axes[1].legend(handles=legend_elements, loc='lower right')
+    
+    plt.tight_layout()
+    plt.savefig(ARTIFACTS_PATH / "feature_type_detailed_comparison.png", dpi=300)
+    print(f"Saved {ARTIFACTS_PATH / 'feature_type_detailed_comparison.png'}")
+    
+    # Print summary statistics
+    print("\n=== Feature Type Summary Statistics ===")
+    for feature_type in FEATURE_GROUPS.keys():
+        ft_data = df_feature[df_feature["Feature Type"] == feature_type]
+        if not ft_data.empty:
+            print(f"\n{feature_type}:")
+            print(f"  ROC AUC - Mean: {ft_data['Test ROC AUC'].mean():.4f}, Std: {ft_data['Test ROC AUC'].std():.4f}")
+            print(f"  Recall  - Mean: {ft_data['Test Recall'].mean():.4f}, Std: {ft_data['Test Recall'].std():.4f}")
+            print(f"  Count: {len(ft_data)} experiments")
+
 if __name__ == "__main__":
     metrics_df = create_metrics_table()
     plot_cv_roc_auc_boxplot()
     plot_cv_vs_test_performance(metrics_df)
     plot_feature_importance()
     plot_submission_distributions()
+    plot_feature_type_comparison(metrics_df)
