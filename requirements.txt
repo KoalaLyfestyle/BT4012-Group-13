@@ -2,3 +2,13 @@ numpy
 pandas
 scikit-learn
 optuna
+accelerate
+catboost
+datasets
+joblib
+lightgbm
+matplotlib
+seaborn
+torch
+transformers
+xgboost
