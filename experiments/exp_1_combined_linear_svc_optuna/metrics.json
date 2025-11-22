@@ -19,14 +19,14 @@
     "dual": false,
     "tol": 0.002146602798983493,
     "max_iter": 10783,
-    "calibration_method": "sigmoid",
     "max_features": 10000,
     "ngram_min": 1,
     "ngram_max": 5,
     "random_state": 42,
+    "calibration_method": "sigmoid",
     "calibration_cv": 3
   },
-  "timestamp": "2025-11-21 14:14:20",
+  "timestamp": "2025-11-21 21:53:56",
   "n_folds": 5,
   "best_fold": 4,
   "average_metrics": {
