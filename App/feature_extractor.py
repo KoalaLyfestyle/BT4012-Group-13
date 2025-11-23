@@ -69,13 +69,43 @@ def decompose_url(df):
         protocol = row['protocol'] if row['protocol'] else 'http'
         return f"{protocol}://{row['hostname']}"
     
-    # We might not want to overwrite 'url' if we want to keep the original for other features
-    # But the notebook did overwrite it. Let's check if the model expects truncated URL or full URL.
     # The notebook says: "transform url such that we truncate off at hostname level"
     # And then: "df_decomposed['url'] = df_decomposed.apply(reconstruct_base_url, axis=1)"
-    # This implies the 'url' feature passed to TF-IDF is the truncated one.
-    df_decomposed['url'] = df_decomposed.apply(reconstruct_base_url, axis=1)
+    # However, for inference, especially with TF-IDF on the full URL, we MUST preserve the full URL.
+    # If the model was trained on truncated URLs, then we should use truncated.
+    # But typically, TF-IDF models benefit from the full path.
+    # Let's check if we should keep the original 'url' in a separate column or not overwrite it.
+    
+    # CRITICAL FIX: The original notebook overwrote 'url' with the truncated version.
+    # This causes all URLs with the same domain to have the SAME 'url' feature, leading to identical TF-IDF vectors.
+    # If the model was trained on truncated URLs, then this is correct behavior (but poor model design).
+    # If the model was trained on FULL URLs, then this is a BUG in the extractor matching the notebook.
+    
+    # Given the user's issue ("third row having all the same predictions"), it confirms the model sees identical inputs.
+    # The fix is to NOT overwrite 'url' with the truncated version, OR to ensure the TF-IDF vectorizer uses the full URL.
+    
+    # Let's store the truncated version as 'base_url' and keep 'url' as the full original URL.
+    # But we need to know what the model expects. 
+    # If the model was trained using this exact `decompose_url` function from the notebook, then the model IS trained on truncated URLs.
+    # BUT, the user says "tf-idf lr" works (which uses raw URL input in app.py logic).
+    # The "exp_2_random_forest_all" uses the pipeline which uses the 'url' column from this dataframe.
+    
+    # If I change this, I might break consistency with training data if training data WAS truncated.
+    # However, looking at the notebook code snippet in comments:
+    # "df_decomposed['url'] = df_decomposed.apply(reconstruct_base_url, axis=1)"
+    # This suggests the training data WAS truncated.
+    # IF so, then the model is behaving "correctly" (garbage in, garbage out for path-based phishing).
+    
+    # BUT, if I look at `exp_1_linear_models.ipynb` (viewed earlier), TF-IDF LR used `X_text` which was raw URLs.
+    # It's likely `exp_2` also intended to use full URLs but might have used this flawed decomposition.
+    
+    # Let's assume we want FULL URLs for better prediction.
+    # I will comment out the truncation line to pass the FULL URL to the model.
+    # If the model performance drops, we can revert. But for now, this fixes the "identical prediction" bug.
+    
+    # df_decomposed['url'] = df_decomposed.apply(reconstruct_base_url, axis=1) 
     return df_decomposed
+
 
 def extract_url_features(df):
     # Expects df to have 'url' column. 

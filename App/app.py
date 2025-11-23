@@ -144,27 +144,35 @@ if not available_models:
     st.stop()
 
 # Helper to run inference
-def run_inference(model, url, model_info):
-    # Create DataFrame
-    df = pd.DataFrame({'url': [url]})
-    
-    # Feature Engineering
-    try:
-        processed_df = extract_url_features(df)
-    except Exception as e:
-        return None, f"Feature Extraction Error: {str(e)}"
+def run_inference(model, url, model_info, precomputed_features=None):
+    # Create DataFrame if features not provided
+    if precomputed_features is None:
+        df = pd.DataFrame({'url': [url]})
+        # Feature Engineering
+        try:
+            processed_df = extract_url_features(df)
+        except Exception as e:
+            return None, f"Feature Extraction Error: {str(e)}"
+    else:
+        processed_df = precomputed_features.copy()
+
     
     # Pre-processing based on model type
-    # If model uses only numeric features, drop string columns to avoid conversion errors
-    # Check for "Numeric" or "NumericFeatures"
     vectorizer_type = model_info.get("vectorizer", "")
     if "Numeric" in vectorizer_type:
-        string_cols = [
-            'url', 'protocol', 'hostname', 'subdomains', 'sld', 'tld',
-            'path', 'query', 'fragment', 'filename', 'file_extension', 
-            'directory_path', 'query_params'
-        ]
-        processed_df = processed_df.drop(columns=[c for c in string_cols if c in processed_df.columns])
+        # Get all non-numeric columns dynamically
+        string_cols = processed_df.select_dtypes(exclude=[np.number]).columns.tolist()
+        processed_df = processed_df.drop(columns=string_cols)
+        
+        # Align features with model expectations (critical for numeric models)
+        try:
+            expected_features = get_feature_columns(model_info["id"])
+            if expected_features:
+                # Reindex to match expected features, filling missing with 0
+                processed_df = processed_df.reindex(columns=expected_features, fill_value=0)
+        except Exception:
+            # If feature alignment fails, continue with current features
+            pass
 
 
     # Prediction
@@ -172,40 +180,42 @@ def run_inference(model, url, model_info):
         # Check if model is a pipeline (sklearn)
         if hasattr(model, "predict_proba"):
             # Special handling for pure TF-IDF pipelines that expect 1D input (list of strings)
-            # instead of a DataFrame. This fixes the issue where passing a DataFrame to TfidfVectorizer
-            # causes it to iterate over column names instead of rows.
             is_pure_tfidf = False
             if hasattr(model, "steps"):
-                # Check the first step of the pipeline
                 first_step = model.steps[0][1]
-                # Check by class name to avoid importing sklearn
                 if first_step.__class__.__name__ == "TfidfVectorizer":
                     is_pure_tfidf = True
             
             if is_pure_tfidf:
                 # Pass the raw URL as a list (1D array-like)
-                # We use the original 'url' argument, not the processed one which might be truncated
-                prob = model.predict_proba([url])[0][1]
+                # If input is a single string, wrap it. If it's a list/series, pass as is.
+                if isinstance(url, str):
+                    probs = model.predict_proba([url])[:, 1]
+                    return probs[0], None
+                else:
+                    # Batch mode for TF-IDF
+                    probs = model.predict_proba(url)[:, 1]
+                    return probs, None
             else:
-                prob = model.predict_proba(processed_df)[0][1]
+                probs = model.predict_proba(processed_df)[:, 1]
+                if len(probs) == 1:
+                    return probs[0], None
+                return probs, None
             
-            return prob, None
         # Check if model is Keras
         elif hasattr(model, "predict"):
-            # Keras models might need specific input format
-            # For now, assuming they take the same processed_df or we might need to adjust
-            # This part is tricky without knowing exact Keras input shape
-            # But let's try passing the df or values
             try:
-                prob = model.predict(processed_df)[0][0]
-                return float(prob), None
+                probs = model.predict(processed_df)
+                if len(probs) == 1:
+                    return float(probs[0][0]), None
+                return probs.flatten(), None
             except:
-                # Maybe it expects separate inputs?
                 return None, "Incompatible Model Input"
         else:
             return None, "Unknown Model Type"
     except Exception as e:
         return None, f"Inference Error: {str(e)}"
+
 
 if mode == "Single URL Analysis":
     st.subheader("Single URL Analysis")
@@ -345,27 +355,47 @@ elif mode == "Batch API Testing":
                     progress_bar.progress((i + 1) / len(selected_models) * 0.3)
                 
                 # 3. Run Inference
-                results = []
-                
-                total_steps = len(urls) * len(loaded_models)
-                current_step = 0
-                
-                status_text.text("Running inference...")
-                
-                for url in urls:
-                    row = {"URL": url}
-                    for m_name, model in loaded_models.items():
-                        # We need model_info for this model
-                        m_info = model_options[m_name]
-                        prob, err = run_inference(model, url, m_info)
-                        if err:
-                            row[m_name] = None
-                        else:
-                            row[m_name] = prob
+                # Optimize: Extract features ONCE for all URLs
+                status_text.text("Extracting features for all URLs...")
+                try:
+                    batch_df = pd.DataFrame({'url': urls})
+                    batch_features = extract_url_features(batch_df)
+                    
+                    results = []
+                    # Initialize results with URLs
+                    for url in urls:
+                        results.append({"URL": url})
                         
-                        current_step += 1
-                        progress_bar.progress(0.3 + (current_step / total_steps) * 0.7)
-                    results.append(row)
+                    # Run inference model by model (batch processing)
+                    for i, m_name in enumerate(selected_models):
+                        status_text.text(f"Running inference for {m_name}...")
+                        model = loaded_models.get(m_name)
+                        if not model:
+                            continue
+                            
+                        m_info = model_options[m_name]
+                        
+                        # Pass the full batch to run_inference
+                        # For TF-IDF, we pass the list of URLs. For others, the precomputed features.
+                        try:
+                            probs, err = run_inference(model, urls, m_info, precomputed_features=batch_features)
+                            
+                            if err:
+                                # If batch fails, try single? Or just mark error
+                                for row in results:
+                                    row[m_name] = None
+                            else:
+                                # Assign probabilities to results
+                                for idx, prob in enumerate(probs):
+                                    results[idx][m_name] = prob
+                        except Exception as e:
+                             for row in results:
+                                    row[m_name] = None
+                        
+                        progress_bar.progress(0.3 + ((i + 1) / len(selected_models)) * 0.7)
+
+                except Exception as e:
+                    st.error(f"Batch processing failed: {e}")
                 
                 status_text.text("Done!")
                 progress_bar.empty()
