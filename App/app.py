@@ -9,7 +9,7 @@ import time
 import os
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
-from utils import get_available_models, load_model, fetch_phishing_urls, SafeTruncatedSVD, check_gpu_status
+from utils import get_available_models, load_model, fetch_phishing_urls, SafeTruncatedSVD, check_gpu_status, get_feature_columns
 from feature_extractor import extract_url_features
 
 # Hack for unpickling SafeTruncatedSVD if it was saved as __main__.SafeTruncatedSVD
@@ -165,6 +165,7 @@ def run_inference(model, url, model_info):
             'directory_path', 'query_params'
         ]
         processed_df = processed_df.drop(columns=[c for c in string_cols if c in processed_df.columns])
+
 
     # Prediction
     try:

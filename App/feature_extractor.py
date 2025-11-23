@@ -215,4 +215,88 @@ def extract_url_features(df):
         numerical_cols.remove('port')
     final_df[numerical_cols] = final_df[numerical_cols].fillna(0)
     
+    # --- NEW: Advanced Feature Engineering to match Training ---
+    
+    # 1. Interaction / Rule-based Scores (Found in notebook)
+    final_df['domain_complexity_score'] = (
+        final_df['num_subdomain'] +
+        (final_df['length_tld'] <= 2).astype(int) +
+        final_df['is_domain_ip'] * 2
+    )
+    max_complexity = 15 + 1 + 2
+    final_df['domain_complexity_score'] = final_df['domain_complexity_score'] / max_complexity
+
+    final_df['suspicion_score'] = (
+        final_df['is_http'] * 2 +
+        (final_df['num_subdomain'] > 2).astype(int) * 2 +
+        final_df['is_domain_ip'].astype(int) * 3 +
+        (final_df['length_tld'] <= 2).astype(int) * 2
+    )
+    max_score = 9
+    final_df['suspicion_score'] = final_df['suspicion_score'] / max_score
+
+    # 1b. More Interaction Features (from notebook)
+    final_df['is_http_and_many_subdomains'] = ((final_df['is_http'] == 1) & (final_df['num_subdomain'] > 2)).astype(int)
+    final_df['ip_and_short_tld'] = (final_df['is_domain_ip'] & (final_df['length_tld'] <= 2)).astype(int)
+    final_df['http_and_missing_domain_info'] = ((final_df['is_http'] == 1) & (final_df['has_subdomain'] == 0) & (final_df['length_sld'] <= 3)).astype(int)
+    final_df['subdomain_depth_x_http'] = final_df['num_subdomain'] * final_df['is_http']
+    final_df['ip_x_http'] = (final_df['is_domain_ip'] * final_df['is_http']).astype(int)
+    
+    # 1c. Specific Domain/TLD checks
+    final_df['has_www_subdomain'] = final_df['subdomains'].apply(lambda x: 1 if x and 'www' in x.split('.') else 0)
+    final_df['has_com_tld'] = final_df['tld'].apply(lambda x: 1 if x == 'com' else 0)
+
+    # 2. Impute Missing LLM/Advanced Features (Default to 0/False)
+
+    llm_features = [
+        'contains_brand_misspell', 'is_homoglyph_attack', 'homoglyph_type', 'risk_score'
+    ]
+    for feat in llm_features:
+        final_df[feat] = 0
+
+    # 3. Mathematical Transformations (Log, Squared, Is_Zero)
+    # Based on missing features identified
+    
+    # Is Zero features
+    is_zero_cols = [
+        'num_dots', 'num_hyphens', 'num_at', 'num_question_marks', 'num_and', 
+        'num_equal', 'num_percent', 'ratio_digits_url', 'ratio_digits_hostname',
+        'avg_word_path', 'length_query', 'num_hyphens_domain', 'length_subdomains'
+    ]
+
+    for col in is_zero_cols:
+        if col in final_df.columns:
+            final_df[f'is_zero_{col}'] = (final_df[col] == 0).astype(int)
+        else:
+            final_df[f'is_zero_{col}'] = 0 # Should not happen if col exists, but safe fallback
+
+    # Log features (log1p to handle 0)
+    log_cols = [
+        'length_url', 'length_path', 'ratio_hostname_url', 'length_words_url',
+        'avg_word_hostname', 'num_unique_chars_hostname'
+    ]
+    for col in log_cols:
+        if col in final_df.columns:
+            # Ensure column is numeric and fill NaNs
+            final_df[col] = pd.to_numeric(final_df[col], errors='coerce').fillna(0)
+            final_df[f'log_{col}'] = np.log1p(final_df[col])
+        else:
+             final_df[f'log_{col}'] = 0
+
+    # Squared features
+    squared_cols = ['ratio_letter_url', 'entropy_hostname']
+    for col in squared_cols:
+        if col in final_df.columns:
+            # Ensure column is numeric and fill NaNs
+            final_df[col] = pd.to_numeric(final_df[col], errors='coerce').fillna(0)
+            final_df[f'squared_{col}'] = final_df[col] ** 2
+        else:
+            final_df[f'squared_{col}'] = 0
+
+            
+    # Bucketed features (Impute with 0 as we don't have bin edges)
+    bucket_cols = ['num_subdomain_bucketed', 'length_tld_bucketed', 'path_depth_bucketed']
+    for col in bucket_cols:
+        final_df[col] = 0
+
     return final_df
