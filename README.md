@@ -37,6 +37,7 @@ The link to the dataset can be found [here](https://data.mendeley.com/datasets/c
 
 - `Processing.ipynb` - Data preprocessing and train-test split
 - `Feature_Engineering_EDA.ipynb` - Feature engineering from URLs and exploratory data analysis
+- `Feature_Engineering_LLM.ipynb` - Feature engineering using Large Language Models (LLMs)
 - `exp_1_linear_models.ipynb` - Exploring Linear models (Logistic Regression, SVM) with TF-IDF and Count vectorization
 - `exp_2_tree_models.ipynb` - Exploring Tree-based models (XGBoost, LightGBM, CatBoost, Random Forest)
 - `exp_3_NN_models.ipynb` - Exploring Neural network architectures (MLP, CharCNN, BiLSTM, Hybrid models)
