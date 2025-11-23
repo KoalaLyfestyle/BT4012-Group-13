@@ -325,7 +325,7 @@ elif mode == "Batch API Testing":
         selected_models = st.multiselect("Select Models to Compare", list(model_options.keys()), default=default_models)
     
     with col2:
-        limit = st.number_input("Max URLs", min_value=5, max_value=100, value=20)
+        limit = st.number_input("Max URLs", min_value=5, max_value=1000, value=20)
     
     if st.button("Fetch URLs & Run Benchmark"):
         if not selected_models:
